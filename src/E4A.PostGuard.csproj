@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>E4A.PostGuard</RootNamespace>
+    <AssemblyName>E4A.PostGuard</AssemblyName>
+
+    <!-- NuGet package metadata -->
+    <PackageId>E4A.PostGuard</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Encryption 4 All</Authors>
+    <Description>PostGuard .NET SDK — identity-based encryption for secure file sharing</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/encryption4all/postguard-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/encryption4all/postguard-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ibe;encryption;postguard;identity-based-encryption</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- Bundle native pg-ffi libraries for all platforms -->
+  <ItemGroup>
+    <Content Include="runtimes/**/*" Pack="true" PackagePath="runtimes" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

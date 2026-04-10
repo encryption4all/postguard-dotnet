@@ -1,0 +1,70 @@
+name: Publish to NuGet
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish NuGet package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      # Download native libraries for all platforms from the postguard repo
+      - name: Download pg-ffi native libraries
+        run: |
+          TARGETS=("linux-x64:tar.gz" "linux-arm64:tar.gz" "osx-arm64:tar.gz" "osx-x64:tar.gz" "win-x64:zip")
+          RUNTIMES_DIR="src/runtimes"
+
+          for entry in "${TARGETS[@]}"; do
+            TARGET="${entry%%:*}"
+            EXT="${entry##*:}"
+            ASSET="pg-ffi-${TARGET}.${EXT}"
+
+            mkdir -p "${RUNTIMES_DIR}/${TARGET}/native"
+
+            echo "Downloading ${ASSET}..."
+            DOWNLOAD_URL=$(gh release list --repo encryption4all/postguard --json tagName,assets -q "
+              [.[] | .assets[] | select(.name == \"${ASSET}\")] | first | .url // empty
+            " 2>/dev/null || true)
+
+            if [ -z "$DOWNLOAD_URL" ]; then
+              echo "::warning::Could not find ${ASSET} in postguard releases"
+              continue
+            fi
+
+            if [ "$EXT" = "tar.gz" ]; then
+              curl -sL "$DOWNLOAD_URL" | tar xz -C "${RUNTIMES_DIR}/${TARGET}/native"
+            else
+              curl -sL "$DOWNLOAD_URL" -o /tmp/pg-ffi.zip
+              unzip -o /tmp/pg-ffi.zip -d "${RUNTIMES_DIR}/${TARGET}/native"
+              rm /tmp/pg-ffi.zip
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract version from the release tag (e.g. v0.1.0 → 0.1.0)
+      - name: Set version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Pack
+        run: |
+          dotnet pack src/E4A.PostGuard.csproj \
+            --configuration Release \
+            -p:Version=${{ steps.version.outputs.version }} \
+            --output ./artifacts
+
+      - name: Publish to NuGet
+        run: |
+          dotnet nuget push ./artifacts/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate

@@ -1,0 +1,52 @@
+name: Continuous integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      # Download pre-built native library for CI
+      - name: Download pg-ffi native library
+        run: |
+          # Fetch the latest pg-ffi release from the postguard repo
+          DOWNLOAD_URL=$(gh release view --repo encryption4all/postguard --json assets -q '.assets[] | select(.name == "pg-ffi-linux-x64.tar.gz") | .url' 2>/dev/null || true)
+          if [ -n "$DOWNLOAD_URL" ]; then
+            mkdir -p src/runtimes/linux-x64/native
+            curl -sL "$DOWNLOAD_URL" | tar xz -C src/runtimes/linux-x64/native
+          else
+            echo "::warning::No pg-ffi release found. Building from source."
+            # Fallback: build from source if no release exists yet
+            rustup default stable
+            git clone --depth 1 https://github.com/encryption4all/postguard.git /tmp/postguard
+            cargo build --release -p pg-ffi --manifest-path /tmp/postguard/Cargo.toml
+            mkdir -p src/runtimes/linux-x64/native
+            cp /tmp/postguard/target/release/libpg_ffi.so src/runtimes/linux-x64/native/
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: dotnet build E4A.PostGuard.slnx --configuration Release
+
+      - name: Pack (dry run)
+        run: dotnet pack src/E4A.PostGuard.csproj --configuration Release --no-build --output ./artifacts
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuget-package
+          path: ./artifacts/*.nupkg
+          retention-days: 7
