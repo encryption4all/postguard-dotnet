@@ -1,15 +1,47 @@
-name: Publish to NuGet
+name: Delivery
+#
+# Release-please and NuGet publishing are combined in one workflow because
+# GITHUB_TOKEN-created releases do not trigger new workflow runs.
+#
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+
+  # ---------------------------------------------------------------------------
+  # Release-please: create release PR and GitHub releases
+  # ---------------------------------------------------------------------------
+
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # NuGet: pack and publish when a release is created
+  # ---------------------------------------------------------------------------
+
   publish:
-    name: Publish NuGet package
+    name: Publish to NuGet
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,7 +56,6 @@ jobs:
       - name: Download pg-ffi native libraries
         run: |
           RUNTIMES_DIR="src/runtimes"
-          # Find the latest pg-ffi release tag
           TAG=$(gh release list --repo encryption4all/postguard --json tagName -q '[.[] | select(.tagName | startswith("pg-ffi-"))][0].tagName')
           if [ -z "$TAG" ]; then
             echo "::error::No pg-ffi release found"
@@ -32,7 +63,6 @@ jobs:
           fi
           echo "Using release: $TAG"
 
-          # Download each platform asset
           for TARGET in linux-x64 linux-arm64 osx-arm64 osx-x64; do
             ASSET="pg-ffi-${TARGET}.tar.gz"
             mkdir -p "${RUNTIMES_DIR}/${TARGET}/native"
@@ -41,7 +71,6 @@ jobs:
             tar xzf "/tmp/${ASSET}" -C "${RUNTIMES_DIR}/${TARGET}/native"
           done
 
-          # Windows
           mkdir -p "${RUNTIMES_DIR}/win-x64/native"
           echo "Downloading pg-ffi-win-x64.zip..."
           gh release download "$TAG" --repo encryption4all/postguard --pattern "pg-ffi-win-x64.zip" --dir /tmp
@@ -49,13 +78,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract version from the release tag (e.g. v0.1.0 → 0.1.0)
-      - name: Set version
-        id: version
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
       - name: Pack
-        run: dotnet pack src/E4A.PostGuard.csproj --configuration Release -p:Version=${{ steps.version.outputs.version }} --output ./artifacts
+        run: dotnet pack src/E4A.PostGuard.csproj --configuration Release -p:Version=${{ needs.release-please.outputs.version }} --output ./artifacts
 
       - name: NuGet login (trusted publishing)
         id: login
