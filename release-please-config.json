@@ -1,0 +1,17 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "E4A.PostGuard",
+      "extra-files": [
+        {
+          "type": "xml",
+          "path": "src/E4A.PostGuard.csproj",
+          "xpath": "//Project/PropertyGroup/Version"
+        }
+      ],
+      "changelog-path": "CHANGELOG.md"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
