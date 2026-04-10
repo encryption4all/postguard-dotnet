@@ -90,8 +90,8 @@ internal class CryptifyClient
             Content = new ByteArrayContent(chunk)
         };
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        request.Content.Headers.Add("Content-Range", $"bytes {offset}-{end}/*");
         request.Headers.TryAddWithoutValidation("cryptifytoken", token);
-        request.Headers.TryAddWithoutValidation("content-range", $"bytes {offset}-{end}/*");
 
         var response = await _http.SendAsync(request, ct);
         await EnsureSuccessAsync(response);
@@ -103,9 +103,12 @@ internal class CryptifyClient
     private async Task FinalizeUploadAsync(
         string uuid, string token, int totalSize, CancellationToken ct)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{_cryptifyUrl}/fileupload/finalize/{uuid}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_cryptifyUrl}/fileupload/finalize/{uuid}")
+        {
+            Content = new ByteArrayContent([])
+        };
+        request.Content.Headers.Add("Content-Range", $"bytes */{totalSize}");
         request.Headers.TryAddWithoutValidation("cryptifytoken", token);
-        request.Headers.TryAddWithoutValidation("content-range", $"bytes */{totalSize}");
 
         var response = await _http.SendAsync(request, ct);
         await EnsureSuccessAsync(response);
