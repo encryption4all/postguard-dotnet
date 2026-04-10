@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.2.0...E4A.PostGuard-v0.2.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* update pg-ffi native binaries to streaming sealer ([90da661](https://github.com/encryption4all/postguard-dotnet/commit/90da66100162dadf1ab249fea77bc548ae28bbbf))
+
 ## [0.2.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.1.2...E4A.PostGuard-v0.2.0) (2026-04-10)
 
 
