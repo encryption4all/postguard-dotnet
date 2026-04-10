@@ -20,34 +20,29 @@ jobs:
       # Download native libraries for all platforms from the postguard repo
       - name: Download pg-ffi native libraries
         run: |
-          TARGETS=("linux-x64:tar.gz" "linux-arm64:tar.gz" "osx-arm64:tar.gz" "osx-x64:tar.gz" "win-x64:zip")
           RUNTIMES_DIR="src/runtimes"
+          # Find the latest pg-ffi release tag
+          TAG=$(gh release list --repo encryption4all/postguard --json tagName -q '[.[] | select(.tagName | startswith("pg-ffi-"))][0].tagName')
+          if [ -z "$TAG" ]; then
+            echo "::error::No pg-ffi release found"
+            exit 1
+          fi
+          echo "Using release: $TAG"
 
-          for entry in "${TARGETS[@]}"; do
-            TARGET="${entry%%:*}"
-            EXT="${entry##*:}"
-            ASSET="pg-ffi-${TARGET}.${EXT}"
-
+          # Download each platform asset
+          for TARGET in linux-x64 linux-arm64 osx-arm64 osx-x64; do
+            ASSET="pg-ffi-${TARGET}.tar.gz"
             mkdir -p "${RUNTIMES_DIR}/${TARGET}/native"
-
             echo "Downloading ${ASSET}..."
-            DOWNLOAD_URL=$(gh release list --repo encryption4all/postguard --json tagName,assets -q "
-              [.[] | .assets[] | select(.name == \"${ASSET}\")] | first | .url // empty
-            " 2>/dev/null || true)
-
-            if [ -z "$DOWNLOAD_URL" ]; then
-              echo "::warning::Could not find ${ASSET} in postguard releases"
-              continue
-            fi
-
-            if [ "$EXT" = "tar.gz" ]; then
-              curl -sL "$DOWNLOAD_URL" | tar xz -C "${RUNTIMES_DIR}/${TARGET}/native"
-            else
-              curl -sL "$DOWNLOAD_URL" -o /tmp/pg-ffi.zip
-              unzip -o /tmp/pg-ffi.zip -d "${RUNTIMES_DIR}/${TARGET}/native"
-              rm /tmp/pg-ffi.zip
-            fi
+            gh release download "$TAG" --repo encryption4all/postguard --pattern "$ASSET" --dir /tmp
+            tar xzf "/tmp/${ASSET}" -C "${RUNTIMES_DIR}/${TARGET}/native"
           done
+
+          # Windows
+          mkdir -p "${RUNTIMES_DIR}/win-x64/native"
+          echo "Downloading pg-ffi-win-x64.zip..."
+          gh release download "$TAG" --repo encryption4all/postguard --pattern "pg-ffi-win-x64.zip" --dir /tmp
+          unzip -o /tmp/pg-ffi-win-x64.zip -d "${RUNTIMES_DIR}/win-x64/native"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

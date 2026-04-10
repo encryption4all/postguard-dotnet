@@ -21,14 +21,13 @@ jobs:
       # Download pre-built native library for CI
       - name: Download pg-ffi native library
         run: |
-          # Fetch the latest pg-ffi release from the postguard repo
-          DOWNLOAD_URL=$(gh release view --repo encryption4all/postguard --json assets -q '.assets[] | select(.name == "pg-ffi-linux-x64.tar.gz") | .url' 2>/dev/null || true)
-          if [ -n "$DOWNLOAD_URL" ]; then
+          TAG=$(gh release list --repo encryption4all/postguard --json tagName -q '[.[] | select(.tagName | startswith("pg-ffi-"))][0].tagName' 2>/dev/null || true)
+          if [ -n "$TAG" ]; then
             mkdir -p src/runtimes/linux-x64/native
-            curl -sL "$DOWNLOAD_URL" | tar xz -C src/runtimes/linux-x64/native
+            gh release download "$TAG" --repo encryption4all/postguard --pattern "pg-ffi-linux-x64.tar.gz" --dir /tmp
+            tar xzf /tmp/pg-ffi-linux-x64.tar.gz -C src/runtimes/linux-x64/native
           else
             echo "::warning::No pg-ffi release found. Building from source."
-            # Fallback: build from source if no release exists yet
             rustup default stable
             git clone --depth 1 https://github.com/encryption4all/postguard.git /tmp/postguard
             cargo build --release -p pg-ffi --manifest-path /tmp/postguard/Cargo.toml
