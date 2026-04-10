@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
@@ -58,5 +59,5 @@ jobs:
       - name: Pack
         run: dotnet pack src/E4A.PostGuard.csproj --configuration Release -p:Version=${{ steps.version.outputs.version }} --output ./artifacts
 
-      - name: Publish to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish to NuGet (trusted publishing)
+        run: dotnet nuget push ./artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate
