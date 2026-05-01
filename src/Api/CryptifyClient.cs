@@ -54,7 +54,14 @@ internal class CryptifyClient
             recipient = recipientEmails,
             mailContent = notify?.Message ?? "",
             mailLang = notify?.Language ?? "EN",
-            confirm = notify?.ConfirmToSender ?? false
+            // Maps to the existing wire-level `confirm` field. Default false —
+            // the upload is silent unless the caller opts in via Notify.Sender.
+            confirm = notify?.Sender ?? false,
+            // Default false in the SDK overrides Cryptify's server-side default
+            // of true so callers get a silent upload regardless of which Cryptify
+            // version they're hitting. Older Cryptify deployments simply ignore
+            // the field.
+            notifyRecipients = notify?.Recipients ?? false,
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{_cryptifyUrl}/fileupload/init")
