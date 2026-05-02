@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.2.1...E4A.PostGuard-v0.3.0) (2026-05-02)
+
+
+### Features
+
+* **upload:** silent-by-default, opt-in Notify.Recipients / Notify.Sender ([b407942](https://github.com/encryption4all/postguard-dotnet/commit/b407942df70e47f5c7b6d470f0cfd92d7ab792bf))
+* **upload:** silent-by-default, opt-in Notify.Recipients/Notify.Sender ([58a3d03](https://github.com/encryption4all/postguard-dotnet/commit/58a3d0392ef28d3c103edca888a517e266479122))
+
 ## [0.2.1](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.2.0...E4A.PostGuard-v0.2.1) (2026-04-10)
 
 
