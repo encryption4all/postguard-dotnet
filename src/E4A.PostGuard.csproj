@@ -9,7 +9,7 @@
 
     <!-- NuGet package metadata -->
     <PackageId>E4A.PostGuard</PackageId>
-    <Version>0.2.1</Version>
+    <Version>0.3.0</Version>
     <Authors>Encryption 4 All</Authors>
     <Description>PostGuard .NET SDK — identity-based encryption for secure file sharing</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
