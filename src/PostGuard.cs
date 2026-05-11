@@ -8,6 +8,8 @@ public class PostGuard
 
     public PostGuard(PostGuardConfig config)
     {
+        ArgumentNullException.ThrowIfNull(config);
+        config.Validate();
         _config = config;
     }
 
