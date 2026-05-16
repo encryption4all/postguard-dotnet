@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.3.0...E4A.PostGuard-v0.4.0) (2026-05-16)
+
+
+### Features
+
+* multi-target net8.0 and net10.0 ([f25fa46](https://github.com/encryption4all/postguard-dotnet/commit/f25fa46029142ebd303011e648b5ee952b47aa93))
+
+
+### Bug Fixes
+
+* reject http:// URLs in PostGuardConfig to prevent plaintext credential leaks ([3fac2a8](https://github.com/encryption4all/postguard-dotnet/commit/3fac2a883252cbbc0cef75f39d891265df221bd1))
+* validate PkgUrl and CryptifyUrl are https:// in PostGuardConfig ([fe6d4eb](https://github.com/encryption4all/postguard-dotnet/commit/fe6d4eb20a795696525fad367a4f241483002d00)), closes [#14](https://github.com/encryption4all/postguard-dotnet/issues/14)
+
 ## [0.3.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.2.1...E4A.PostGuard-v0.3.0) (2026-05-02)
 
 
