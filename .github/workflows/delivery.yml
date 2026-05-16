@@ -50,7 +50,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       # Download native libraries for all platforms from the postguard repo
       - name: Download pg-ffi native libraries
