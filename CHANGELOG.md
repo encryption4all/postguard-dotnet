@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.4.0...E4A.PostGuard-v0.4.1) (2026-05-17)
+
+
+### Bug Fixes
+
+* reject unknown recipient BaseType in BuildPolicyJson ([#20](https://github.com/encryption4all/postguard-dotnet/issues/20)) ([8128f92](https://github.com/encryption4all/postguard-dotnet/commit/8128f9254e2dfe7fa4248210d06ac49a4245b8b7))
+* reuse single HttpClient across SealPipeline calls ([#19](https://github.com/encryption4all/postguard-dotnet/issues/19)) ([fb3e3d5](https://github.com/encryption4all/postguard-dotnet/commit/fb3e3d570ae0df0e731da2f776bc77765bd4c249)), closes [#11](https://github.com/encryption4all/postguard-dotnet/issues/11)
+
 ## [0.4.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.3.0...E4A.PostGuard-v0.4.0) (2026-05-16)
 
 
