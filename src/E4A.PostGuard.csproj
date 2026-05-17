@@ -24,6 +24,10 @@
     <None Include="../README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="E4A.PostGuard.Tests" />
+  </ItemGroup>
+
   <!-- Native pg-ffi libraries: pack into runtimes/ and copy to output at runtime -->
   <ItemGroup>
     <None Include="runtimes/linux-x64/native/**" Pack="true" PackagePath="runtimes/linux-x64/native" Link="runtimes/linux-x64/native/%(Filename)%(Extension)"/>

@@ -41,6 +41,6 @@ public class SignBuilders
 
 public class RecipientBuilders
 {
-    public RecipientBuilder Email(string email) => new(email, "email");
-    public RecipientBuilder EmailDomain(string email) => new(email, "emailDomain");
+    public RecipientBuilder Email(string email) => new(email, RecipientBaseType.Email);
+    public RecipientBuilder EmailDomain(string email) => new(email, RecipientBaseType.EmailDomain);
 }

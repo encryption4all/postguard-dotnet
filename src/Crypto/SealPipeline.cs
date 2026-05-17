@@ -71,16 +71,18 @@ internal static class SealPipeline
         {
             var con = new List<object>();
 
-            if (r.BaseType == "email")
+            object baseAttribute = r.BaseType switch
             {
-                con.Add(new { t = EmailAttributeType, v = r.Email });
-            }
-            else if (r.BaseType == "emailDomain")
-            {
-                // Extract domain from email
-                var domain = r.Email.Contains('@') ? r.Email.Split('@')[1] : r.Email;
-                con.Add(new { t = DomainAttributeType, v = domain });
-            }
+                RecipientBaseType.Email => new { t = EmailAttributeType, v = r.Email },
+                RecipientBaseType.EmailDomain => new
+                {
+                    t = DomainAttributeType,
+                    v = r.Email.Contains('@') ? r.Email.Split('@')[1] : r.Email,
+                },
+                _ => throw new ArgumentException(
+                    $"Unsupported recipient base type: {r.BaseType}", nameof(recipients)),
+            };
+            con.Add(baseAttribute);
 
             foreach (var (type, value) in r.Extras)
             {
