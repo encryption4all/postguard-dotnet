@@ -13,6 +13,22 @@ public class PostGuardConfig
     /// </summary>
     public bool AllowInsecureUrls { get; init; }
 
+    /// <summary>
+    /// Optional caller-supplied <see cref="System.Net.Http.HttpClient"/>. When
+    /// set, the SDK reuses this client for all PKG and Cryptify calls and does
+    /// NOT dispose it — ownership stays with the caller (DI-friendly). When
+    /// null, <see cref="PostGuard"/> creates and owns a single long-lived client.
+    /// </summary>
+    public HttpClient? HttpClient { get; init; }
+
+    /// <summary>
+    /// Request timeout applied to the SDK-owned <see cref="System.Net.Http.HttpClient"/>.
+    /// Ignored when <see cref="HttpClient"/> is supplied (the caller owns the
+    /// timeout in that case). Defaults to <see cref="System.Net.Http.HttpClient"/>'s
+    /// own default of 100 seconds when null.
+    /// </summary>
+    public TimeSpan? Timeout { get; init; }
+
     internal void Validate()
     {
         if (AllowInsecureUrls)
