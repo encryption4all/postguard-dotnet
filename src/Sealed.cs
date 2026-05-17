@@ -10,11 +10,13 @@ namespace E4A.PostGuard;
 public class Sealed
 {
     private readonly PostGuardConfig _config;
+    private readonly HttpClient _http;
     private readonly EncryptInput _input;
 
-    internal Sealed(PostGuardConfig config, EncryptInput input)
+    internal Sealed(PostGuardConfig config, HttpClient http, EncryptInput input)
     {
         _config = config;
+        _http = http;
         _input = input;
     }
 
@@ -28,7 +30,7 @@ public class Sealed
         UploadOptions? options = null,
         CancellationToken ct = default)
     {
-        return await SealPipeline.SealAndUploadAsync(_config, _input, options, ct);
+        return await SealPipeline.SealAndUploadAsync(_config, _http, _input, options, ct);
     }
 
     /// <summary>
@@ -38,6 +40,6 @@ public class Sealed
     /// <returns>The sealed (encrypted + signed) byte array.</returns>
     public async Task<byte[]> ToBytesAsync(CancellationToken ct = default)
     {
-        return await SealPipeline.SealAsync(_config, _input, ct);
+        return await SealPipeline.SealAsync(_config, _http, _input, ct);
     }
 }

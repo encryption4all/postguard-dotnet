@@ -15,13 +15,13 @@ internal static class SealPipeline
     /// </summary>
     public static async Task<UploadResult> SealAndUploadAsync(
         PostGuardConfig config,
+        HttpClient http,
         EncryptInput input,
         UploadOptions? uploadOptions,
         CancellationToken ct = default)
     {
-        var sealedBytes = await SealAsync(config, input, ct);
+        var sealedBytes = await SealAsync(config, http, input, ct);
 
-        using var http = CreateHttpClient(config);
         var cryptify = new CryptifyClient(http, config.CryptifyUrl);
         var uuid = await cryptify.UploadAsync(
             sealedBytes, input.Recipients, uploadOptions?.Notify, ct);
@@ -34,6 +34,7 @@ internal static class SealPipeline
     /// </summary>
     public static async Task<byte[]> SealAsync(
         PostGuardConfig config,
+        HttpClient http,
         EncryptInput input,
         CancellationToken ct = default)
     {
@@ -41,7 +42,6 @@ internal static class SealPipeline
             ? ak.ApiKey
             : throw new ArgumentException("Only ApiKey signing is supported");
 
-        using var http = CreateHttpClient(config);
         var pkg = new PkgClient(http, config.PkgUrl);
 
         // Fetch MPK and signing keys in parallel
@@ -91,18 +91,5 @@ internal static class SealPipeline
         }
 
         return JsonSerializer.Serialize(policy);
-    }
-
-    private static HttpClient CreateHttpClient(PostGuardConfig config)
-    {
-        var http = new HttpClient();
-        if (config.Headers != null)
-        {
-            foreach (var (key, value) in config.Headers)
-            {
-                http.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
-            }
-        }
-        return http;
     }
 }

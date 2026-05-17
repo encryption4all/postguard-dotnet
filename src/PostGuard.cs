@@ -2,15 +2,48 @@ using E4A.PostGuard.Models;
 
 namespace E4A.PostGuard;
 
-public class PostGuard
+public class PostGuard : IDisposable
 {
     private readonly PostGuardConfig _config;
+    private readonly HttpClient _http;
+    private readonly bool _ownsHttp;
+    private bool _disposed;
 
     public PostGuard(PostGuardConfig config)
     {
         ArgumentNullException.ThrowIfNull(config);
         config.Validate();
         _config = config;
+
+        if (config.HttpClient is not null)
+        {
+            _http = config.HttpClient;
+            _ownsHttp = false;
+        }
+        else
+        {
+            // SocketsHttpHandler with a bounded PooledConnectionLifetime so a
+            // long-lived client still picks up DNS changes — recommended pattern
+            // for singleton HttpClient. See:
+            // https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines
+            var handler = new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+            };
+            _http = new HttpClient(handler, disposeHandler: true);
+            if (config.Timeout is { } timeout)
+            {
+                _http.Timeout = timeout;
+            }
+            if (config.Headers is not null)
+            {
+                foreach (var (key, value) in config.Headers)
+                {
+                    _http.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
+                }
+            }
+            _ownsHttp = true;
+        }
     }
 
     /// <summary>
@@ -30,7 +63,18 @@ public class PostGuard
     /// </summary>
     public Sealed Encrypt(EncryptInput input)
     {
-        return new Sealed(_config, input);
+        return new Sealed(_config, _http, input);
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        if (_ownsHttp)
+        {
+            _http.Dispose();
+        }
+        GC.SuppressFinalize(this);
     }
 }
 

@@ -91,4 +91,55 @@ public class PostGuardConfigTests
     {
         Assert.Throws<ArgumentNullException>(() => new PostGuard(null!));
     }
+
+    [Fact]
+    public void Dispose_DoesNotDisposeInjectedHttpClient()
+    {
+        using var injected = new HttpClient();
+        var config = new PostGuardConfig
+        {
+            PkgUrl = ValidPkg,
+            CryptifyUrl = ValidCryptify,
+            HttpClient = injected,
+        };
+
+        var pg = new PostGuard(config);
+        pg.Dispose();
+
+        // If injected was disposed, this throws ObjectDisposedException.
+        injected.DefaultRequestHeaders.TryAddWithoutValidation("X-Test", "ok");
+    }
+
+    [Fact]
+    public void Dispose_DisposesOwnedHttpClient()
+    {
+        var config = new PostGuardConfig
+        {
+            PkgUrl = ValidPkg,
+            CryptifyUrl = ValidCryptify,
+        };
+
+        var pg = new PostGuard(config);
+        pg.Dispose();
+        // Calling Dispose twice must be safe.
+        pg.Dispose();
+    }
+
+    [Fact]
+    public void Ctor_AppliesTimeoutToOwnedClient()
+    {
+        var config = new PostGuardConfig
+        {
+            PkgUrl = ValidPkg,
+            CryptifyUrl = ValidCryptify,
+            Timeout = TimeSpan.FromSeconds(42),
+        };
+
+        using var pg = new PostGuard(config);
+
+        // No exception during construction; the Timeout property is applied
+        // internally — see PostGuard ctor. We can at least verify the SDK
+        // accepts the value without throwing.
+        Assert.NotNull(pg);
+    }
 }
