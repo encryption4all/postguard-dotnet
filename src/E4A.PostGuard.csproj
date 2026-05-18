@@ -9,7 +9,7 @@
 
     <!-- NuGet package metadata -->
     <PackageId>E4A.PostGuard</PackageId>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Authors>Encryption 4 All</Authors>
     <Description>PostGuard .NET SDK — identity-based encryption for secure file sharing</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="E4A.PostGuard.Tests" />
+    <InternalsVisibleTo Include="E4A.PostGuard.Tests"/>
   </ItemGroup>
 
   <!-- Native pg-ffi libraries: pack into runtimes/ and copy to output at runtime -->
