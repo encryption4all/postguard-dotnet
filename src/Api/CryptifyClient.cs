@@ -133,7 +133,8 @@ internal class CryptifyClient
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
-            throw new NetworkException((int)response.StatusCode, body);
+            var url = response.RequestMessage?.RequestUri?.ToString() ?? "<unknown>";
+            throw new NetworkException((int)response.StatusCode, body, url);
         }
     }
 }
