@@ -16,14 +16,14 @@ var pg = new PostGuard(new PostGuardConfig
     CryptifyUrl = "https://fileshare.postguard.eu"
 });
 
-var sealed = pg.Encrypt(new EncryptInput
+var encrypted = pg.Encrypt(new EncryptInput
 {
     Files = [new PgFile("report.txt", fileStream)],
     Recipients = [pg.Recipient.Email("citizen@example.com")],
     Sign = pg.Sign.ApiKey("PG-API-xxx")
 });
 
-var result = await sealed.UploadAsync();
+var result = await encrypted.UploadAsync();
 Console.WriteLine(result.Uuid);
 ```
 
