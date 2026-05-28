@@ -89,12 +89,9 @@ internal class CryptifyClient
     private async Task<string> StoreChunkAsync(
         string uuid, string token, byte[] data, int offset, int end, CancellationToken ct)
     {
-        var chunk = new byte[end - offset];
-        Buffer.BlockCopy(data, offset, chunk, 0, chunk.Length);
-
         var request = new HttpRequestMessage(HttpMethod.Put, $"{_cryptifyUrl}/fileupload/{uuid}")
         {
-            Content = new ByteArrayContent(chunk)
+            Content = new ByteArrayContent(data, offset, end - offset)
         };
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         request.Content.Headers.Add("Content-Range", $"bytes {offset}-{end}/*");
