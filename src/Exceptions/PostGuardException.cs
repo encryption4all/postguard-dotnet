@@ -10,12 +10,14 @@ public class NetworkException : PostGuardException
 {
     public int StatusCode { get; }
     public string Body { get; }
+    public string Url { get; }
 
-    public NetworkException(int statusCode, string body)
-        : base($"HTTP {statusCode}: {body}")
+    public NetworkException(int statusCode, string body, string url)
+        : base($"HTTP {statusCode} at {url}: {body}")
     {
         StatusCode = statusCode;
         Body = body;
+        Url = url;
     }
 }
 
