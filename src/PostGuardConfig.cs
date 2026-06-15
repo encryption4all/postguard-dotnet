@@ -4,6 +4,14 @@ public class PostGuardConfig
 {
     public required string PkgUrl { get; init; }
     public required string CryptifyUrl { get; init; }
+
+    /// <summary>
+    /// Extra headers added to every PKG and Cryptify request (only when the SDK
+    /// owns the <see cref="HttpClient"/> — see <see cref="HttpClient"/>). The SDK
+    /// also sends an <c>X-POSTGUARD-CLIENT-VERSION</c> header automatically;
+    /// supply that key here (any casing) to override it (e.g. an embedding host
+    /// identifying itself).
+    /// </summary>
     public Dictionary<string, string>? Headers { get; init; }
 
     /// <summary>
@@ -16,8 +24,11 @@ public class PostGuardConfig
     /// <summary>
     /// Optional caller-supplied <see cref="System.Net.Http.HttpClient"/>. When
     /// set, the SDK reuses this client for all PKG and Cryptify calls and does
-    /// NOT dispose it — ownership stays with the caller (DI-friendly). When
-    /// null, <see cref="PostGuard"/> creates and owns a single long-lived client.
+    /// NOT dispose it — ownership stays with the caller (DI-friendly). The SDK
+    /// also does NOT mutate its headers, so it will not add
+    /// <c>X-POSTGUARD-CLIENT-VERSION</c>; set that yourself if you want it. When
+    /// null, <see cref="PostGuard"/> creates and owns a single long-lived client
+    /// (and sends <c>X-POSTGUARD-CLIENT-VERSION</c> automatically).
     /// </summary>
     public HttpClient? HttpClient { get; init; }
 
