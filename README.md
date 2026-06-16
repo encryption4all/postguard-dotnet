@@ -33,7 +33,7 @@ See the [full API reference](https://docs.postguard.eu/repos/postguard-dotnet) f
 
 ### Prerequisites
 
-- .NET 10.0+ SDK (the projects multi-target `net8.0` and `net10.0`, so the SDK must support the highest target, `net10.0`)
+- .NET 10.0+ SDK
 - Rust toolchain ([rustup](https://rustup.rs/))
 
 ### Build native library
