@@ -1,0 +1,79 @@
+using System.IO.Compression;
+using System.Text;
+using E4A.PostGuard.Models;
+using E4A.PostGuard.Zip;
+
+namespace E4A.PostGuard.Tests;
+
+public class ZipHelperTests
+{
+    private static PgFile File(string name, string content) =>
+        new(name, new MemoryStream(Encoding.UTF8.GetBytes(content)));
+
+    private static Dictionary<string, string> ReadZip(byte[] zip)
+    {
+        var entries = new Dictionary<string, string>();
+        using var archive = new ZipArchive(new MemoryStream(zip), ZipArchiveMode.Read);
+        foreach (var entry in archive.Entries)
+        {
+            using var reader = new StreamReader(entry.Open());
+            entries[entry.FullName] = reader.ReadToEnd();
+        }
+        return entries;
+    }
+
+    [Fact]
+    public void SingleFile_RoundTrips()
+    {
+        var zip = ZipHelper.CreateZip([File("hello.txt", "world")]);
+
+        var entries = ReadZip(zip);
+        Assert.Single(entries);
+        Assert.Equal("world", entries["hello.txt"]);
+    }
+
+    [Fact]
+    public void MultipleFiles_AllPresentWithContent()
+    {
+        var zip = ZipHelper.CreateZip([
+            File("a.txt", "alpha"),
+            File("dir/b.txt", "beta"),
+            File("c.bin", "gamma"),
+        ]);
+
+        var entries = ReadZip(zip);
+        Assert.Equal(3, entries.Count);
+        Assert.Equal("alpha", entries["a.txt"]);
+        Assert.Equal("beta", entries["dir/b.txt"]);
+        Assert.Equal("gamma", entries["c.bin"]);
+    }
+
+    [Fact]
+    public void EmptyFileList_ProducesValidEmptyZip()
+    {
+        var zip = ZipHelper.CreateZip([]);
+
+        Assert.NotEmpty(zip); // a valid (empty) zip still has an end-of-central-directory record
+        Assert.Empty(ReadZip(zip));
+    }
+
+    [Fact]
+    public void PreservesEntryNames_IncludingDuplicatesContent()
+    {
+        var binary = new byte[256];
+        for (var i = 0; i < binary.Length; i++)
+        {
+            binary[i] = (byte)i;
+        }
+
+        var zip = ZipHelper.CreateZip([new PgFile("payload.bin", new MemoryStream(binary))]);
+
+        using var archive = new ZipArchive(new MemoryStream(zip), ZipArchiveMode.Read);
+        var entry = Assert.Single(archive.Entries);
+        Assert.Equal("payload.bin", entry.FullName);
+
+        using var ms = new MemoryStream();
+        entry.Open().CopyTo(ms);
+        Assert.Equal(binary, ms.ToArray());
+    }
+}
