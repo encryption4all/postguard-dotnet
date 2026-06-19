@@ -42,6 +42,11 @@ public class PostGuard : IDisposable
                     _http.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
                 }
             }
+            // Identify this SDK + version to the PKG and Cryptify on every
+            // request. Skipped when the caller already set the header (they win).
+            // Only for the SDK-owned client — a caller-supplied HttpClient may
+            // be shared, so we never mutate its default headers.
+            ClientVersion.ApplyTo(_http, config.Headers);
             _ownsHttp = true;
         }
     }
