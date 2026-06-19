@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.4.1...E4A.PostGuard-v0.5.0) (2026-06-19)
+
+
+### Features
+
+* send X-POSTGUARD-CLIENT-VERSION on every request ([#33](https://github.com/encryption4all/postguard-dotnet/issues/33)) ([23eeb00](https://github.com/encryption4all/postguard-dotnet/commit/23eeb00728eefa642b057647e3273305651e8c13))
+
+
+### Bug Fixes
+
+* include request URL in NetworkException ([#31](https://github.com/encryption4all/postguard-dotnet/issues/31)) ([c33860b](https://github.com/encryption4all/postguard-dotnet/commit/c33860bdcfd979db26323ce16405a005d13f2537)), closes [#26](https://github.com/encryption4all/postguard-dotnet/issues/26)
+
+
+### Performance Improvements
+
+* avoid per-chunk byte[] copy in CryptifyClient.StoreChunkAsync ([#30](https://github.com/encryption4all/postguard-dotnet/issues/30)) ([a3762d0](https://github.com/encryption4all/postguard-dotnet/commit/a3762d071555996b52fc6cc484e0e95f96d48a72)), closes [#27](https://github.com/encryption4all/postguard-dotnet/issues/27)
+
 ## [0.4.1](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.4.0...E4A.PostGuard-v0.4.1) (2026-05-17)
 
 
