@@ -94,7 +94,10 @@ internal class CryptifyClient
             Content = new ByteArrayContent(data, offset, end - offset)
         };
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        request.Content.Headers.Add("Content-Range", $"bytes {offset}-{end}/*");
+        // `end` is the exclusive end index of the chunk; RFC 9110 §14.4 range-end
+        // is inclusive, so emit the last byte index (end - 1). `end > offset`
+        // always holds here (chunkLen >= 1), so this never goes negative.
+        request.Content.Headers.Add("Content-Range", $"bytes {offset}-{end - 1}/*");
         request.Headers.TryAddWithoutValidation("cryptifytoken", token);
 
         var response = await _http.SendAsync(request, ct);
