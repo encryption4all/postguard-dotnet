@@ -42,6 +42,9 @@ jobs:
       - name: Build
         run: dotnet build E4A.PostGuard.slnx --configuration Release
 
+      - name: Test
+        run: dotnet test E4A.PostGuard.slnx --configuration Release --no-build
+
       - name: Pack (dry run)
         run: dotnet pack src/E4A.PostGuard.csproj --configuration Release --no-build --output ./artifacts
 
