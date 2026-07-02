@@ -8,16 +8,20 @@ public class PostGuardException : Exception
 
 public class NetworkException : PostGuardException
 {
+    // Raw upstream response body, retained for diagnostics only. Kept private
+    // so it is never surfaced in the exception message or via a public property,
+    // where it could leak sensitive upstream data into logs. See issue #41.
+    private readonly string _body;
+
     public int StatusCode { get; }
-    public string Body { get; }
     public string Url { get; }
 
     public NetworkException(int statusCode, string body, string url)
-        : base($"HTTP {statusCode} at {url}: {body}")
+        : base($"HTTP {statusCode} received from upstream service")
     {
         StatusCode = statusCode;
-        Body = body;
         Url = url;
+        _body = body;
     }
 }
 
