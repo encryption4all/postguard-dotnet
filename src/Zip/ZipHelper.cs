@@ -12,7 +12,17 @@ internal static class ZipHelper
         {
             foreach (var file in files)
             {
-                var entry = archive.CreateEntry(file.Name, CompressionLevel.Optimal);
+                // Strip any directory components so traversal sequences (e.g. "../../")
+                // cannot be embedded as ZIP entry names in produced archives.
+                var entryName = Path.GetFileName(file.Name);
+                if (string.IsNullOrEmpty(entryName))
+                {
+                    throw new ArgumentException(
+                        $"File name '{file.Name}' does not resolve to a valid entry name.",
+                        nameof(files));
+                }
+
+                var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
                 using var entryStream = entry.Open();
                 file.Content.CopyTo(entryStream);
             }

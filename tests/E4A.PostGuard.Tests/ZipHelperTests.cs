@@ -44,8 +44,33 @@ public class ZipHelperTests
         var entries = ReadZip(zip);
         Assert.Equal(3, entries.Count);
         Assert.Equal("alpha", entries["a.txt"]);
-        Assert.Equal("beta", entries["dir/b.txt"]);
+        // Directory components are stripped, so "dir/b.txt" is stored as "b.txt".
+        Assert.Equal("beta", entries["b.txt"]);
         Assert.Equal("gamma", entries["c.bin"]);
+    }
+
+    [Theory]
+    [InlineData("../../etc/passwd", "passwd")]
+    [InlineData("dir/nested/file.txt", "file.txt")]
+    [InlineData("/absolute/path.txt", "path.txt")]
+    public void SanitizesEntryNames_StrippingDirectoryComponents(string name, string expected)
+    {
+        var zip = ZipHelper.CreateZip([File(name, "payload")]);
+
+        var entries = ReadZip(zip);
+        var entryName = Assert.Single(entries.Keys);
+        Assert.Equal(expected, entryName);
+        Assert.DoesNotContain("..", entryName);
+        Assert.Equal("payload", entries[entryName]);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("dir/")]
+    [InlineData("../")]
+    public void ThrowsArgumentException_WhenNameHasNoFileComponent(string name)
+    {
+        Assert.Throws<ArgumentException>(() => ZipHelper.CreateZip([File(name, "payload")]));
     }
 
     [Fact]
