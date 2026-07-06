@@ -53,6 +53,12 @@ public class ZipHelperTests
     [InlineData("../../etc/passwd", "passwd")]
     [InlineData("dir/nested/file.txt", "file.txt")]
     [InlineData("/absolute/path.txt", "path.txt")]
+    // Windows-style separators must be stripped too: these archives are consumed
+    // cross-platform, so backslash traversal must not survive creation on Linux/macOS.
+    [InlineData("..\\..\\etc\\passwd", "passwd")]
+    [InlineData("dir\\nested\\file.txt", "file.txt")]
+    [InlineData("C:\\Windows\\evil.txt", "evil.txt")]
+    [InlineData("mixed/dir\\file.txt", "file.txt")]
     public void SanitizesEntryNames_StrippingDirectoryComponents(string name, string expected)
     {
         var zip = ZipHelper.CreateZip([File(name, "payload")]);
@@ -68,9 +74,23 @@ public class ZipHelperTests
     [InlineData("")]
     [InlineData("dir/")]
     [InlineData("../")]
+    [InlineData("dir\\")]
+    [InlineData("..")]
+    [InlineData(".")]
     public void ThrowsArgumentException_WhenNameHasNoFileComponent(string name)
     {
         Assert.Throws<ArgumentException>(() => ZipHelper.CreateZip([File(name, "payload")]));
+    }
+
+    [Fact]
+    public void ThrowsArgumentException_WhenSanitizedNamesCollide()
+    {
+        // "a/x.txt" and "b/x.txt" both flatten to "x.txt"; ZipArchive would silently
+        // allow the duplicate and lose one entry on extraction, so reject it.
+        Assert.Throws<ArgumentException>(() => ZipHelper.CreateZip([
+            File("a/x.txt", "first"),
+            File("b/x.txt", "second"),
+        ]));
     }
 
     [Fact]
