@@ -1,7 +1,4 @@
-
----
-
-## Agent notes (migrated from the dobby memory repo)
+# Agent notes (migrated from the dobby memory repo)
 
 ## Overview
 C# SDK for PostGuard (PKG sign + Cryptify upload). xUnit tests. Multi-targets `net8.0` and `net10.0`. Release: release-please.
