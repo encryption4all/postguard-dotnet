@@ -73,7 +73,7 @@ internal class CryptifyClient
         };
 
         var response = await _http.SendAsync(request, ct);
-        await EnsureSuccessAsync(response);
+        await response.EnsureSuccessAsync();
 
         var json = await response.Content.ReadAsStringAsync(ct);
         using var doc = JsonDocument.Parse(json);
@@ -101,7 +101,7 @@ internal class CryptifyClient
         request.Headers.TryAddWithoutValidation("cryptifytoken", token);
 
         var response = await _http.SendAsync(request, ct);
-        await EnsureSuccessAsync(response);
+        await response.EnsureSuccessAsync();
 
         return GetCryptifyToken(response)
             ?? throw new PostGuardException("Missing cryptifytoken header in chunk response");
@@ -118,7 +118,7 @@ internal class CryptifyClient
         request.Headers.TryAddWithoutValidation("cryptifytoken", token);
 
         var response = await _http.SendAsync(request, ct);
-        await EnsureSuccessAsync(response);
+        await response.EnsureSuccessAsync();
     }
 
     private static string? GetCryptifyToken(HttpResponseMessage response)
@@ -126,15 +126,5 @@ internal class CryptifyClient
         return response.Headers.TryGetValues("cryptifytoken", out var values)
             ? values.FirstOrDefault()
             : null;
-    }
-
-    private static async Task EnsureSuccessAsync(HttpResponseMessage response)
-    {
-        if (!response.IsSuccessStatusCode)
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            var url = response.RequestMessage?.RequestUri?.ToString() ?? "<unknown>";
-            throw new NetworkException((int)response.StatusCode, body, url);
-        }
     }
 }
