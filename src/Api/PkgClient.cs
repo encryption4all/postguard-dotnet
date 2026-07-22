@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using E4A.PostGuard.Exceptions;
 
 namespace E4A.PostGuard.Api;
 
@@ -23,7 +22,7 @@ internal class PkgClient
     public async Task<string> FetchMpkJsonAsync(CancellationToken ct = default)
     {
         var response = await _http.GetAsync($"{_pkgUrl}/v2/parameters", ct);
-        await EnsureSuccessAsync(response);
+        await response.EnsureSuccessAsync();
 
         var json = await response.Content.ReadAsStringAsync(ct);
         using var doc = JsonDocument.Parse(json);
@@ -49,7 +48,7 @@ internal class PkgClient
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
         var response = await _http.SendAsync(request, ct);
-        await EnsureSuccessAsync(response);
+        await response.EnsureSuccessAsync();
 
         var json = await response.Content.ReadAsStringAsync(ct);
         using var doc = JsonDocument.Parse(json);
@@ -66,15 +65,5 @@ internal class PkgClient
         }
 
         return (pubSignKeyJson, privSignKeyJson);
-    }
-
-    private static async Task EnsureSuccessAsync(HttpResponseMessage response)
-    {
-        if (!response.IsSuccessStatusCode)
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            var url = response.RequestMessage?.RequestUri?.ToString() ?? "<unknown>";
-            throw new NetworkException((int)response.StatusCode, body, url);
-        }
     }
 }
