@@ -85,6 +85,17 @@ public class BuildPolicyJsonTests
     }
 
     [Fact]
+    public void DuplicatePolicyKey_Throws()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => SealPipeline.BuildPolicyJson([
+            Email("alice@example.com"),
+            Email("alice@example.com"),
+        ]));
+
+        Assert.Equal("recipients", ex.ParamName);
+    }
+
+    [Fact]
     public void UnknownBaseType_Throws()
     {
         var bogus = new RecipientBuilder("alice@example.com", (RecipientBaseType)999);
