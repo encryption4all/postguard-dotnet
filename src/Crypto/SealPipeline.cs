@@ -89,7 +89,14 @@ internal static class SealPipeline
                 con.Add(new { t = type, v = value });
             }
 
-            policy[r.Email] = new { ts = timestamp, con };
+            // Recipients are keyed by email, so two recipients with the same email
+            // would silently overwrite each other and drop one from the policy.
+            // Reject the collision explicitly, mirroring ZipHelper.CreateZip.
+            if (!policy.TryAdd(r.Email, new { ts = timestamp, con }))
+            {
+                throw new ArgumentException(
+                    $"Duplicate recipient policy key '{r.Email}'.", nameof(recipients));
+            }
         }
 
         return JsonSerializer.Serialize(policy);
