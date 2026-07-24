@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.1](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.5.0...E4A.PostGuard-v0.5.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* emit inclusive range-end in Cryptify Content-Range header ([#34](https://github.com/encryption4all/postguard-dotnet/issues/34)) ([73c2e43](https://github.com/encryption4all/postguard-dotnet/commit/73c2e43993b805b188e07fe0d2073e36e335098b)), closes [#28](https://github.com/encryption4all/postguard-dotnet/issues/28)
+* harden ZIP entry-name handling in ZipHelper ([#42](https://github.com/encryption4all/postguard-dotnet/issues/42)) ([2ffe84e](https://github.com/encryption4all/postguard-dotnet/commit/2ffe84e9ec811c414104eeae9937cbdfe3cd576c))
+* reject duplicate recipient policy keys in BuildPolicyJson ([#48](https://github.com/encryption4all/postguard-dotnet/issues/48)) ([f5ad9b8](https://github.com/encryption4all/postguard-dotnet/commit/f5ad9b878391c9e59945404b3b2b8ec8cfe4bb59))
+* stop leaking raw upstream body in NetworkException ([#41](https://github.com/encryption4all/postguard-dotnet/issues/41)) ([#43](https://github.com/encryption4all/postguard-dotnet/issues/43)) ([135dee3](https://github.com/encryption4all/postguard-dotnet/commit/135dee32e0954c3735ec2f69da58a7b18395fa52))
+
 ## [0.5.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.4.1...E4A.PostGuard-v0.5.0) (2026-06-19)
 
 
