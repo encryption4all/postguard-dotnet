@@ -9,6 +9,15 @@ The Coder workspace ships the net10.0 SDK but not the net8.0 runtime: `dotnet te
 ## Pinned pg-ffi native binaries
 `.github/pg-ffi-version` holds one line: the exact `encryption4all/postguard` release tag both workflows download the native libraries from. Bump that file to move to a newer release; don't reintroduce a "newest `pg-ffi-*` release" lookup, it changes what ships without a commit. The Dobby App cannot push `.github/workflows/`, so workflow edits have to go to a maintainer as a patch in a PR comment.
 
+## Tracked public API surface
+`src/PublicAPI.Shipped.txt` and `src/PublicAPI.Unshipped.txt` list every public member of `E4A.PostGuard`, checked by Microsoft.CodeAnalysis.PublicApiAnalyzers during `dotnet build` (no separate CI step).
+
+- Changing the public surface without updating the files fails the build. Add new members to `PublicAPI.Unshipped.txt`; record a removal there as `*REMOVED*<the exact shipped line>`.
+- To regenerate a line, build and copy the signature out of the `RS0016` message, which prints it in the file's own format (`Namespace.Type.Member(args) -> ret`). IDEs offer this as a code fix on the diagnostic.
+- Severity is raised through `<WarningsAsErrors>` in `src/E4A.PostGuard.csproj`, not `.editorconfig`. RS0017 and friends are reported against `PublicAPI.Shipped.txt`, and path-based `.editorconfig` severity does not reach additional files, so it silently stays a warning there.
+- Both TFMs currently produce the same surface (no `#if` in `src/`), so one pair of files covers them. If a member ever becomes TFM-conditional the files have to be split per TFM.
+- **At release time**, move the `PublicAPI.Unshipped.txt` entries into `PublicAPI.Shipped.txt` (applying `*REMOVED*` lines as deletions) and leave the unshipped file with just its `#nullable enable` header. release-please does not do this.
+
 ## API layout
 - `src/Api/PkgClient.cs`: PKG sign-key + MPK fetch.
 - `src/Api/CryptifyClient.cs`: chunked Cryptify upload (init / store-chunk / finalize).

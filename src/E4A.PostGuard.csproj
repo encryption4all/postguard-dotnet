@@ -18,6 +18,14 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ibe;encryption;postguard;identity-based-encryption</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!--
+      The public surface of this package is a contract, so PublicApiAnalyzers findings have to
+      break the build instead of scrolling past as warnings. WarningsAsErrors is used rather than
+      an .editorconfig severity because RS0017 and friends are reported against
+      PublicAPI.Shipped.txt, and path-based .editorconfig severity does not reach additional files.
+    -->
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0024;RS0025;RS0036;RS0037;RS0041;RS0048;RS0050</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +34,16 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="E4A.PostGuard.Tests"/>
+  </ItemGroup>
+
+  <!-- Public API surface tracking: every public member must be listed in PublicAPI.*.txt -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt"/>
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt"/>
   </ItemGroup>
 
   <!-- Native pg-ffi libraries: pack into runtimes/ and copy to output at runtime -->
