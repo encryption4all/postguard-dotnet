@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace E4A.PostGuard.Tests;
 
@@ -31,29 +32,42 @@ public class PublicApiTrackingTests
             $"PublicAPI files declare types the assembly no longer exports: {string.Join(", ", stale)}");
     }
 
-    [Fact]
-    public void ShippedFile_TracksNullability()
+    [Theory]
+    [InlineData("PublicAPI.Shipped.txt")]
+    [InlineData("PublicAPI.Unshipped.txt")]
+    public void ApiFile_TracksNullability(string fileName)
     {
         // Without the header the analyzer records every reference type as oblivious, so a
-        // nullable-annotation change would slip through unreviewed.
-        var lines = File.ReadAllLines(Path.Combine(RepoRoot(), "src", "PublicAPI.Shipped.txt"));
+        // nullable-annotation change would slip through unreviewed. Dropping it from the
+        // unshipped file still builds green, so nothing but this test catches that.
+        var lines = File.ReadAllLines(Path.Combine(RepoRoot(), "src", fileName));
         Assert.Equal("#nullable enable", lines.FirstOrDefault());
     }
 
     [Fact]
     public void Csproj_KeepsTheAnalyzerWiredUpAndFailingTheBuild()
     {
-        var csproj = File.ReadAllText(Path.Combine(RepoRoot(), "src", "E4A.PostGuard.csproj"));
+        // Parsed rather than substring-matched: reformatting an element, or moving
+        // WarningsAsErrors into a second PropertyGroup, leaves the wiring fully intact
+        // and must not red-light this test.
+        var csproj = XDocument.Load(Path.Combine(RepoRoot(), "src", "E4A.PostGuard.csproj"));
 
-        Assert.Contains("Microsoft.CodeAnalysis.PublicApiAnalyzers", csproj, StringComparison.Ordinal);
-        Assert.Contains("<AdditionalFiles Include=\"PublicAPI.Shipped.txt\"/>", csproj, StringComparison.Ordinal);
-        Assert.Contains("<AdditionalFiles Include=\"PublicAPI.Unshipped.txt\"/>", csproj, StringComparison.Ordinal);
+        Assert.Contains("Microsoft.CodeAnalysis.PublicApiAnalyzers", Includes(csproj, "PackageReference"));
+        Assert.Contains("PublicAPI.Shipped.txt", Includes(csproj, "AdditionalFiles"));
+        Assert.Contains("PublicAPI.Unshipped.txt", Includes(csproj, "AdditionalFiles"));
 
         // Left as warnings, an undeclared API change scrolls past in a green build.
-        var warningsAsErrors = csproj.Split('\n').Single(line => line.Contains("<WarningsAsErrors>"));
+        var warningsAsErrors = string.Join(';', csproj.Descendants("WarningsAsErrors").Select(element => element.Value));
         Assert.Contains("RS0016", warningsAsErrors, StringComparison.Ordinal);
         Assert.Contains("RS0017", warningsAsErrors, StringComparison.Ordinal);
     }
+
+    /// <summary>The <c>Include</c> attribute of every <paramref name="elementName"/> item in the project.</summary>
+    private static string[] Includes(XDocument csproj, string elementName) =>
+        csproj.Descendants(elementName)
+            .Select(element => (string?)element.Attribute("Include"))
+            .OfType<string>()
+            .ToArray();
 
     /// <summary>Shipped plus unshipped additions, minus the entries marked <c>*REMOVED*</c>.</summary>
     private static HashSet<string> DeclaredEntries()
