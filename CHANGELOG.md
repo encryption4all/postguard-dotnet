@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.5.0...E4A.PostGuard-v0.6.0) (2026-07-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* NetworkException.Body was removed in #43 (GHSA info-exposure fix) but landed as a plain fix:, so release-please computed 0.5.1. The public-API tracking added in #52 records the removal as *REMOVED*; this marker corrects the next release to reflect it.
+
+### Bug Fixes
+
+* emit inclusive range-end in Cryptify Content-Range header ([#34](https://github.com/encryption4all/postguard-dotnet/issues/34)) ([73c2e43](https://github.com/encryption4all/postguard-dotnet/commit/73c2e43993b805b188e07fe0d2073e36e335098b)), closes [#28](https://github.com/encryption4all/postguard-dotnet/issues/28)
+* harden ZIP entry-name handling in ZipHelper ([#42](https://github.com/encryption4all/postguard-dotnet/issues/42)) ([2ffe84e](https://github.com/encryption4all/postguard-dotnet/commit/2ffe84e9ec811c414104eeae9937cbdfe3cd576c))
+* NetworkException no longer exposes raw upstream response bodies ([7d2e1fb](https://github.com/encryption4all/postguard-dotnet/commit/7d2e1fb3ad408cb2aab1dd92fb2bc9f2d220945f))
+* reject duplicate recipient policy keys in BuildPolicyJson ([#48](https://github.com/encryption4all/postguard-dotnet/issues/48)) ([f5ad9b8](https://github.com/encryption4all/postguard-dotnet/commit/f5ad9b878391c9e59945404b3b2b8ec8cfe4bb59))
+* stop leaking raw upstream body in NetworkException ([#41](https://github.com/encryption4all/postguard-dotnet/issues/41)) ([#43](https://github.com/encryption4all/postguard-dotnet/issues/43)) ([135dee3](https://github.com/encryption4all/postguard-dotnet/commit/135dee32e0954c3735ec2f69da58a7b18395fa52))
+
 ## [0.5.0](https://github.com/encryption4all/postguard-dotnet/compare/E4A.PostGuard-v0.4.1...E4A.PostGuard-v0.5.0) (2026-06-19)
 
 
