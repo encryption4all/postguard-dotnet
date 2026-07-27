@@ -54,13 +54,13 @@ jobs:
             8.0.x
             10.0.x
 
-      # Download native libraries for all platforms from the postguard repo
+      # Download the pinned native libraries for all platforms from the postguard repo
       - name: Download pg-ffi native libraries
         run: |
           RUNTIMES_DIR="src/runtimes"
-          TAG=$(gh release list --repo encryption4all/postguard --json tagName -q '[.[] | select(.tagName | startswith("pg-ffi-"))][0].tagName')
+          TAG=$(tr -d '[:space:]' < .github/pg-ffi-version)
           if [ -z "$TAG" ]; then
-            echo "::error::No pg-ffi release found"
+            echo "::error::.github/pg-ffi-version is empty or missing"
             exit 1
           fi
           echo "Using release: $TAG"
