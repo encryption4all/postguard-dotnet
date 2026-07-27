@@ -1,6 +1,5 @@
 #nullable enable
 E4A.PostGuard.Exceptions.NetworkException
-E4A.PostGuard.Exceptions.NetworkException.Body.get -> string!
 E4A.PostGuard.Exceptions.NetworkException.NetworkException(int statusCode, string! body, string! url) -> void
 E4A.PostGuard.Exceptions.NetworkException.StatusCode.get -> int
 E4A.PostGuard.Exceptions.NetworkException.Url.get -> string!
