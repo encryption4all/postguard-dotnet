@@ -45,7 +45,7 @@ cd ../postguard/pg-ffi
 ./build.sh
 ```
 
-This compiles the Rust FFI crate and copies the native library to `src/runtimes/`.
+This compiles the Rust FFI crate and copies the native library to `src/runtimes/`. CI and the NuGet publish instead download the pre-built release pinned in `.github/pg-ffi-version`; check out that tag to build the same binaries locally.
 
 ### Build the .NET solution
 

@@ -6,6 +6,9 @@ C# SDK for PostGuard (PKG sign + Cryptify upload). xUnit tests. Multi-targets `n
 ## Workspace limitation
 The Coder workspace ships the net10.0 SDK but not the net8.0 runtime: `dotnet test --framework net8.0` fails with a "framework 'Microsoft.NETCore.App', version '8.0.0' not found" error. `dotnet build` succeeds for both TFMs (build doesn't need the runtime). Run tests on net10.0 locally; CI exercises both. Note this in the PR body if relevant.
 
+## Pinned pg-ffi native binaries
+`.github/pg-ffi-version` holds one line: the exact `encryption4all/postguard` release tag both workflows download the native libraries from. Bump that file to move to a newer release; don't reintroduce a "newest `pg-ffi-*` release" lookup, it changes what ships without a commit. The Dobby App cannot push `.github/workflows/`, so workflow edits have to go to a maintainer as a patch in a PR comment.
+
 ## API layout
 - `src/Api/PkgClient.cs`: PKG sign-key + MPK fetch.
 - `src/Api/CryptifyClient.cs`: chunked Cryptify upload (init / store-chunk / finalize).
