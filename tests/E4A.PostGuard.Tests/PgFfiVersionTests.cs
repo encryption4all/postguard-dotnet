@@ -16,7 +16,7 @@ public class PgFfiVersionTests
         var lines = File.ReadAllLines(path).Where(line => line.Trim().Length > 0).ToArray();
 
         Assert.Single(lines);
-        Assert.Matches(@"^pg-ffi-v\d+\.\d+\.\d+$", lines[0]);
+        Assert.Matches(@"^pg-ffi-v\d+\.\d+\.\d+$", lines[0].Trim());
     }
 
     private static string RepoRoot()
