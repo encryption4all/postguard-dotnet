@@ -55,7 +55,12 @@ dotnet build E4A.PostGuard.slnx
 
 ### Run the example
 
-See [postguard-examples/pg-dotnet](https://github.com/encryption4all/postguard-examples/tree/main/pg-dotnet).
+See [`examples/pg-dotnet`](https://github.com/encryption4all/postguard-js/tree/main/examples/pg-dotnet)
+in the postguard-js workspace. It lived in `encryption4all/postguard-examples`
+until that repository was folded in and archived.
+
+It multi-targets `net8.0;net10.0`, so a bare `dotnet run` fails with "Your project
+targets multiple frameworks" — pass `-f net10.0`.
 
 ## Releasing
 
