@@ -23,10 +23,9 @@ public class ClaudeMdOrientationTests
     /// <summary>
     /// The headings the cut removed. The byte cap alone would let any one of them return in a
     /// slimmer form, and each is a whole category the file is no longer for: a container
-    /// environment quirk, a build mechanism, an API walkthrough, three invariants that already
-    /// have tests of their own (<see cref="PgFfiVersionTests"/>,
-    /// <see cref="PublicApiTrackingTests"/>, <see cref="CryptifyContentRangeTests"/>,
-    /// <see cref="ZipHelperTests"/>).
+    /// environment quirk, an API walkthrough, and four invariants that already have tests of
+    /// their own (<see cref="PgFfiVersionTests"/>, <see cref="PublicApiTrackingTests"/>,
+    /// <see cref="CryptifyContentRangeTests"/>, <see cref="ZipHelperTests"/>).
     /// </summary>
     private static readonly string[] CutSections =
     [
