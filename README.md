@@ -1,5 +1,15 @@
 # <p align="center"><img src="./img/pg_logo.svg" height="128px" alt="PostGuard" /></p>
 
+> [!IMPORTANT]
+> **This repository is archived.** The .NET SDK now lives in
+> [`privacybydesign/postguard`, under `pg-dotnet/`](https://github.com/privacybydesign/postguard/tree/main/pg-dotnet).
+> `E4A.PostGuard` is still published to NuGet under the same package id; from
+> 0.6.11 on it is built and released from there, at `pg-core`'s version. Open
+> issues and pull requests in `privacybydesign/postguard`.
+>
+> What follows describes the repository as it was at 0.6.0, its last release
+> from here. The build and release instructions no longer apply.
+
 > For full documentation, visit [docs.postguard.eu](https://docs.postguard.eu/repos/postguard-dotnet).
 
 .NET SDK for PostGuard encryption, published as `E4A.PostGuard` on NuGet. Allows .NET applications to encrypt files for recipients using identity-based encryption. This is a sending-side SDK: it handles encryption and upload, while decryption is handled by the recipient through [postguard.eu](https://postguard.eu) or the mail plugins.
